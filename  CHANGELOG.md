@@ -8,6 +8,7 @@ New test cases
 
 ### Fixed
 *NOT()* operator (including combination `Not(IsNull())`).
+
 --
 Dev: add script `compile` to package.json
 
