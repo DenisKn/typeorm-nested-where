@@ -1,9 +1,10 @@
 {
   "name": "typeorm-nested-where",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Nested relations filtering for Typeorm repositories",
   "main": "index.js",
   "scripts": {
+    "compile": "npx tsc index.ts",
     "test": "jest --config jest.config.js"
   },
   "author": "denkezin95@gmail.com",

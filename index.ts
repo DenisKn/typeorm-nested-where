@@ -76,7 +76,12 @@ export function findOperatorToSql(value: FindOperator<any> | any, aliasPath: str
         if (value.value instanceof FindOperator) {
             return 'NOT(' + findOperatorToSql(value, aliasPath, parameters) + ')';
         } else {
-            return aliasPath + ' != ' + param;
+            // for 'isNull()' value.value equals undefined, but _value exists
+            if (value._value?._type === 'isNull') {
+                return `${aliasPath} IS NOT NULL`;
+            } else {
+                return aliasPath + ' <> ' + param;
+            }
         }
     case 'lessThan':
         return aliasPath + ' < ' + param;

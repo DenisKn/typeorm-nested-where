@@ -2,7 +2,7 @@ import { whereToRaw } from "../index";
 import { 
     createConnection, getConnection,
     Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, getRepository,
-    FindConditions, MoreThan, In, Not, 
+    FindConditions, MoreThan, In, Not, IsNull, 
 } from "typeorm";
 
 @Entity()
@@ -73,61 +73,60 @@ test("pretest: test that database filled", async () => {
 });
 
 test("without nested conditions, one to many", async () => { 
-    const where1: FindConditions<Category> = {
+    const where: FindConditions<Category> = {
         name: 'Category B'
     };
-    const res1 = await getRepository(Category).find({
-        where: whereToRaw<Category>('Category', where1, 'none'),
+    const res = await getRepository(Category).find({
+        where: whereToRaw<Category>('Category', where, 'none'),
         relations: ['posts']
     });
-    expect(res1.length).toBe(1);
-    expect(res1[0].posts?.length).toBe(2);
+    expect(res.length).toBe(1);
+    expect(res[0].posts?.length).toBe(2);
 });
 
 test("without nested conditions, many to one", async () => {
-    const where2: FindConditions<Post> = {
+    const where: FindConditions<Post> = {
         title: 'Post 1'
     };
-    const res2 = await getRepository(Post).find({
-        where: whereToRaw<Post>('Post', where2, 'none'),
+    const res = await getRepository(Post).find({
+        where: whereToRaw<Post>('Post', where, 'none'),
         relations: ['category']
     });
-    expect(res2.length).toBe(1);
-    expect(res2[0].category).toBeDefined();
-    expect(res2[0].category?.name).toBe('Category A');
+    expect(res.length).toBe(1);
+    expect(res[0].category).toBeDefined();
+    expect(res[0].category?.name).toBe('Category A');
 });
 
 test("with nested conditions, one to many", async () => {
-    const where3: FindConditions<Category> = {
+    const where: FindConditions<Category> = {
         name: 'Category B',
         posts: { 
             title: 'Post 2'
         } as FindConditions<Post> as any
     };
-    const res3 = await getRepository(Category).find({
-        where: whereToRaw<Category>('Category', where3, 'none'),
+    const res = await getRepository(Category).find({
+        where: whereToRaw<Category>('Category', where, 'none'),
         relations: ['posts']
     });
-    expect(res3.length).toBe(1);
-    expect(res3[0].posts?.length).toBe(1);
-    expect(res3[0].posts[0].title).toBe('Post 2');
+    expect(res.length).toBe(1);
+    expect(res[0].posts?.length).toBe(1);
+    expect(res[0].posts[0].title).toBe('Post 2');
 });
 
 test("with nested conditions, many to one", async () => {
-    const where4: FindConditions<Post> = {
+    const where: FindConditions<Post> = {
         category: {
             name: 'Category B'
         } as FindConditions<Category>
     };
-    const res4 = await getRepository(Post).find({
-        where: whereToRaw<Post>('Post', where4, 'none'),
+    const res = await getRepository(Post).find({
+        where: whereToRaw<Post>('Post', where, 'none'),
         relations: ['category']
     });
-    expect(res4.length).toBe(2);
-    expect(res4[0].category?.name).toBe('Category B');
-    expect(res4[1].category?.name).toBe('Category B');
+    expect(res.length).toBe(2);
+    expect(res[0].category?.name).toBe('Category B');
+    expect(res[1].category?.name).toBe('Category B');
 });
-
 
 test("many conditions", async () => {
     const where: FindConditions<Category> = {
@@ -153,4 +152,31 @@ test("many conditions", async () => {
             expect(category.posts[0].title).toBe('Post 3');
         }
     }
+});
+
+test("operator 'Not' with primitive type parameter", async () => {
+    const where: FindConditions<Post> = {
+        category: {
+            name: Not('Category B')
+        } as FindConditions<Category>
+    };
+    const res = await getRepository(Post).find({
+        where: whereToRaw<Post>('Post', where, 'none'),
+        relations: ['category']
+    });
+    expect(res.length).toBe(1);
+    expect(res[0].category?.name).toBe('Category A');
+});
+
+test("special test-case: conditions with Not(IsNull())", async () => {
+    const where: FindConditions<Post> = {
+        category: {
+            name: Not(IsNull())
+        } as FindConditions<Category>
+    };
+    const res = await getRepository(Post).find({
+        where: whereToRaw<Post>('Post', where, 'none'),
+        relations: ['category']
+    });
+    expect(res.length).toBe(3);
 });

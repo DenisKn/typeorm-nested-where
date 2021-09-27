@@ -44,6 +44,7 @@ exports.whereToRaw = whereToRaw;
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 function findOperatorToSql(value, aliasPath, parameters) {
+    var _a;
     var param;
     // wrap in quotes if string
     if (!value.multipleParameters) {
@@ -80,7 +81,13 @@ function findOperatorToSql(value, aliasPath, parameters) {
                 return 'NOT(' + findOperatorToSql(value, aliasPath, parameters) + ')';
             }
             else {
-                return aliasPath + ' != ' + param;
+                // for 'isNull()' value.value equals undefined, but _value exists
+                if (((_a = value._value) === null || _a === void 0 ? void 0 : _a._type) === 'isNull') {
+                    return aliasPath + " IS NOT NULL";
+                }
+                else {
+                    return aliasPath + ' <> ' + param;
+                }
             }
         case 'lessThan':
             return aliasPath + ' < ' + param;
