@@ -2,7 +2,7 @@ import { whereToRaw } from "../index";
 import { 
     createConnection, getConnection,
     Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, getRepository,
-    FindConditions, MoreThan, In, Not, IsNull, 
+    FindConditions, MoreThan, In, Not, IsNull, Raw, 
 } from "typeorm";
 
 @Entity()
@@ -179,4 +179,15 @@ test("special test-case: conditions with Not(IsNull())", async () => {
         relations: ['category']
     });
     expect(res.length).toBe(3);
+});
+
+test("operator Raw", async () => {
+    const where: FindConditions<Category> = {
+        name: Raw(alias => `${alias} ILIKE '%goRY b%'`)
+    };
+    const res = await getRepository(Category).find({
+        where: whereToRaw<Category>('Category', where, 'none'),
+    });
+    expect(res.length).toBe(1);
+    expect(res[0].name).toBe('Category B');
 });

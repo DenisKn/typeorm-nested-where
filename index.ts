@@ -104,8 +104,8 @@ export function findOperatorToSql(value: FindOperator<any> | any, aliasPath: str
     case 'isNull':
         return aliasPath + ' IS NULL';
     case 'raw':
-        if (value instanceof Function) {
-            return value(aliasPath);
+        if (value.value instanceof Function) {
+            return value.value(aliasPath);
         } else {
             return aliasPath + ' = ' + value;
         }

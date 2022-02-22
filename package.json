@@ -1,6 +1,6 @@
 {
   "name": "typeorm-nested-where",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Nested relations filtering for Typeorm repositories",
   "main": "index.js",
   "scripts": {

@@ -1,6 +1,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.0.5] - 2021-02-22
+
+### Added
+New test cases for checking new fixes.
+
+### Fixed
+*Raw()* operator with functions works correctly now.
+
+
 ## [1.0.4] - 2021-09-27
 
 ### Added
